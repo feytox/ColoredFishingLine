@@ -4,8 +4,7 @@
   "package": "uwu.feytox.coloredfishingline.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "FishingBobberEntityRendererMixin",
-    "SelectedItemAccessor"
+    "FishingBobberEntityRendererMixin"
   ],
   "client": [
   ],
