@@ -20,9 +20,6 @@
 
   "environment": "client",
   "entrypoints": {
-    "preLaunch": [
-      "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
-    ],
     "client": [
       "uwu.feytox.coloredfishingline.client.ColoredFishingLine"
     ]

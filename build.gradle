@@ -26,8 +26,6 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	implementation("com.github.LlamaLad7:MixinExtras:0.0.6")
-	annotationProcessor("com.github.LlamaLad7:MixinExtras:0.0.6")
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 }
