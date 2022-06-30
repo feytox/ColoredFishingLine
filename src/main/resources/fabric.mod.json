@@ -1,32 +1,32 @@
 {
   "schemaVersion": 1,
-  "id": "dyeable_fishing_lines",
+  "id": "coloredfishingline",
   "version": "${version}",
 
-  "name": "Dyeable Fishing Lines",
-  "description": "What the name says",
+  "name": "Colored Fishing Line",
+  "description": "",
   "authors": [
+    "Feytox",
     "Fusion Flux (Super Cool And Awesome)"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/feytox/ColoredFishingLine"
   },
 
-  "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "license": "MIT",
+  "icon": "assets/coloredfishingline/icon.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "preLaunch": [
       "com.llamalad7.mixinextras.MixinExtrasBootstrap::init"
     ],
-    "main": [
-      "net.fabricmc.example.DyeableFishingLines"
+    "client": [
+      "uwu.feytox.coloredfishingline.client.ColoredFishingLine"
     ]
   },
   "mixins": [
-    "modid.mixins.json"
+    "coloredfishingline.mixins.json"
   ],
 
   "depends": {
