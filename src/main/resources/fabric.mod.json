@@ -7,9 +7,11 @@
   "description": "",
   "authors": [
     "Feytox",
+    "DearFox",
     "Fusion Flux (Super Cool And Awesome)"
   ],
   "contact": {
+    "homepage": "https://modrinth.com/mod/cfl",
     "sources": "https://github.com/feytox/ColoredFishingLine"
   },
 
