@@ -10,8 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -101,13 +99,15 @@ public abstract class FishingBobberEntityRendererMixin {
         return 0;
     }
 
-   @Inject(method = "render(Lnet/minecraft/entity/projectile/FishingBobberEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/FishingBobberEntityRenderer;renderFishingLine(FFFLnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;FF)V"),locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void mixin(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
-                       VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci, PlayerEntity playerEntity,
-                       MatrixStack.Entry entry, Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer vertexConsumer, int j,
-                       ItemStack itemStack, float h, float k, float l, double d, double e, double m, double n, double o, double p,
-                       double q, float r, double s, double t, double u, float v, float w, float x, VertexConsumer vertexConsumer2,
-                       MatrixStack.Entry entry2, int y, int z) {
+   @Inject(method = "render(Lnet/minecraft/entity/projectile/FishingBobberEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+           at = @At(value = "INVOKE",
+                   target = "Lnet/minecraft/client/render/entity/FishingBobberEntityRenderer;renderFishingLine(FFFLnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;FF)V"),
+   locals = LocalCapture.CAPTURE_FAILSOFT)
+    private void onRenderFishingLine(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
+                                     VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci,
+                                     PlayerEntity playerEntity, int j, float h, float k, double o, double p, double q,
+                                     float r, double s, double t, double u, float v, float w, float x,
+                                     VertexConsumer vertexConsumer2, MatrixStack.Entry entry2, int y, int z) {
        PlayerEntity bobberOwner = fishingBobberEntity.getPlayerOwner();
        if (bobberOwner != null) {
            Iterable<ItemStack> itemsHand = bobberOwner.getHandItems();
@@ -143,7 +143,9 @@ public abstract class FishingBobberEntityRendererMixin {
        }
    }
 
-    @Redirect(method = "render(Lnet/minecraft/entity/projectile/FishingBobberEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/FishingBobberEntityRenderer;renderFishingLine(FFFLnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;FF)V"))
+    @Redirect(method = "render(Lnet/minecraft/entity/projectile/FishingBobberEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/render/entity/FishingBobberEntityRenderer;renderFishingLine(FFFLnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;FF)V"))
     private void mixin(float x, float y, float z, VertexConsumer entry2, MatrixStack.Entry matrices, float segmentStart, float segmentEnd) {
     }
 
