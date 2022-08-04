@@ -271,11 +271,6 @@ public abstract class FishingBobberEntityRendererMixin {
                 buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(107, 63, 190, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
             if (segmentStart <= 4f / 16f)
                 buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        }  else if (name.contains("ukraine")) {
-            if (segmentStart <= 1f && segmentStart > 8f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 91, 187, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 8f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 213, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
         } else if (name.contains("genderfluid")) {
             if (segmentStart <= 1f && segmentStart > 12f / 15f)
                 buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 117, 162, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
