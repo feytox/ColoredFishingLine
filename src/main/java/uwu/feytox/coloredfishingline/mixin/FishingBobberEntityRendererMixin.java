@@ -10,8 +10,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.DyeColor;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Matrix3f;
-import net.minecraft.util.math.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -102,41 +100,43 @@ public abstract class FishingBobberEntityRendererMixin {
     }
 
    @Inject(method = "render(Lnet/minecraft/entity/projectile/FishingBobberEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/entity/FishingBobberEntityRenderer;renderFishingLine(FFFLnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;FF)V"),locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void mixin(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
-                       VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci, PlayerEntity playerEntity,
-                       MatrixStack.Entry entry, Matrix4f matrix4f, Matrix3f matrix3f, VertexConsumer vertexConsumer, int j,
-                       ItemStack itemStack, float h, float k, float l, double d, double e, double m, double n, double o, double p,
-                       double q, float r, double s, double t, double u, float v, float w, float x, VertexConsumer vertexConsumer2,
-                       MatrixStack.Entry entry2, int y, int z) {
-       Iterable<ItemStack> itemsHand = fishingBobberEntity.getPlayerOwner().getItemsHand();
-       List<ItemStack> selectedItems = new ArrayList<>();
-       itemsHand.forEach(selectedItems::add);
+    private void onRenderFishingLine(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
+                       VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci,
+                       PlayerEntity playerEntity, int j, float h, float k, double o, double p, double q,
+                       float r, double s, double t, double u, float v, float w, float x,
+                       VertexConsumer vertexConsumer2, MatrixStack.Entry entry2, int y, int z) {
+       PlayerEntity bobberOwner = fishingBobberEntity.getPlayerOwner();
+       if (bobberOwner != null) {
+           Iterable<ItemStack> itemsHand = bobberOwner.getItemsHand();
+           List<ItemStack> selectedItems = new ArrayList<>();
+           itemsHand.forEach(selectedItems::add);
 
-       String name = selectedItems.get(0).getName().getString().toLowerCase(Locale.ROOT) + " " +
-               selectedItems.get(1).getName().getString().toLowerCase(Locale.ROOT);
-       if (name.contains("trans") || name.contains("lesbian") || name.contains("genderfluid") || name.contains("pan")
-               || name.contains("poly") || name.contains("aro") || name.contains("aroace")) {
-           if (z <= 15) {
-               customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 15),
-                       percentage(z + 1, 15));
+           String name = selectedItems.get(0).getName().getString().toLowerCase(Locale.ROOT) + " " +
+                   selectedItems.get(1).getName().getString().toLowerCase(Locale.ROOT);
+           if (name.contains("trans") || name.contains("lesbian") || name.contains("genderfluid") || name.contains("pan")
+                   || name.contains("poly") || name.contains("aro") || name.contains("aroace")) {
+               if (z <= 15) {
+                   customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 15),
+                           percentage(z + 1, 15));
+               }
+           } else if (name.contains("mlm") || name.contains("agender") || name.contains("demiboy") || name.contains("demigirl")
+                   || name.contains("bigender")) {
+               if (z <= 14) {
+                   customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 14),
+                           percentage(z + 1, 14));
+               }
+           } else if (name.contains("gay") || name.contains("proud")) {
+               if (z <= 12) {
+                   customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 12),
+                           percentage(z + 1, 12));
+               }
+           } else if (checkNameForColor(name) || name.contains("invis")) {
+               customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 16),
+                       percentage(z + 1, 16));
+           } else {
+               customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 16),
+                       percentage(z + 1, 16));
            }
-       } else if (name.contains("mlm") || name.contains("agender") || name.contains("demiboy") || name.contains("demigirl")
-               || name.contains("bigender")) {
-           if (z <= 14) {
-               customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 14),
-                       percentage(z + 1, 14));
-           }
-       } else if (name.contains("gay") || name.contains("proud")) {
-           if (z <= 12) {
-               customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 12),
-                       percentage(z + 1, 12));
-           }
-       } else if (checkNameForColor(name) || name.contains("invis")) {
-           customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 16),
-                   percentage(z + 1, 16));
-       } else {
-           customRenderFishingLine(fishingBobberEntity, v, w, x, vertexConsumer2, entry2, percentage(z, 16),
-                   percentage(z + 1, 16));
        }
    }
 
@@ -159,9 +159,11 @@ public abstract class FishingBobberEntityRendererMixin {
         float r2;
         float g2;
         float b2;
-        Iterable<ItemStack> itemsHand = fishingBobberEntity.getPlayerOwner().getItemsHand();
-        List<ItemStack> selectedItems = new ArrayList<>();
-        itemsHand.forEach(selectedItems::add);
+        PlayerEntity bobberOwner = fishingBobberEntity.getPlayerOwner();
+        if (bobberOwner != null) {
+            Iterable<ItemStack> itemsHand = bobberOwner.getItemsHand();
+            List<ItemStack> selectedItems = new ArrayList<>();
+            itemsHand.forEach(selectedItems::add);
 
         String name = selectedItems.get(0).getName().getString().toLowerCase(Locale.ROOT) + " " +
                 selectedItems.get(1).getName().getString().toLowerCase(Locale.ROOT);
@@ -272,157 +274,158 @@ public abstract class FishingBobberEntityRendererMixin {
             if (segmentStart <= 4f / 16f)
                 buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
         } else if (name.contains("genderfluid")) {
-            if (segmentStart <= 1f && segmentStart > 12f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 117, 162, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 12f / 15f && segmentStart > 9f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 9f / 15f && segmentStart > 6f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(190, 24, 214, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 6f / 15f && segmentStart > 3f / 15f)
+                if (segmentStart <= 1f && segmentStart > 12f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 117, 162, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 12f / 15f && segmentStart > 9f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 9f / 15f && segmentStart > 6f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(190, 24, 214, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 6f / 15f && segmentStart > 3f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 3f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(51, 62, 189, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("aroace")) {
+                if (segmentStart <= 1f && segmentStart > 12f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(226, 140, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 12f / 15f && segmentStart > 9f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(236, 205, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 9f / 15f && segmentStart > 6f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 6f / 15f && segmentStart > 3f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(98, 174, 220, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 3f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(32, 56, 86, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("aro")) {
+                if (segmentStart <= 1f && segmentStart > 12f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(61, 165, 66, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 12f / 15f && segmentStart > 9f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(167, 211, 121, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 9f / 15f && segmentStart > 6f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 6f / 15f && segmentStart > 3f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(169, 169, 169, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 3f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("ace") || name.contains("asexual")) {
+                if (segmentStart <= 1f && segmentStart > 12f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 12f / 16f && segmentStart > 8f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(163, 163, 163, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 8f / 16f && segmentStart > 4f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 4f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(128, 0, 128, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("pan")) {
+                if (segmentStart <= 1f && segmentStart > 10f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(254, 33, 139, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(254, 215, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(33, 176, 254, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("poly")) {
+                if (segmentStart <= 1f && segmentStart > 10f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(246, 28, 158, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(7, 213, 105, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(28, 146, 246, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("genderqueer")) {
+                if (segmentStart <= 1f && segmentStart > 10f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(181, 126, 220, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(74, 129, 35, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("disability")) {
+                if (segmentStart <= 1f && segmentStart > 10f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(234, 191, 63, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(207, 209, 208, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 5f / 15f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(211, 152, 74, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("demiboy")) {
+                if ((segmentStart <= 1f && segmentStart > 12f / 14f) || segmentStart <= 2f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(127, 127, 127, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if ((segmentStart <= 12f / 14f && segmentStart > 10f / 14f) || (segmentStart <= 4f / 14f && segmentStart > 2f / 14f))
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(196, 196, 196, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if ((segmentStart <= 10f / 14f && segmentStart > 8f / 14f) || (segmentStart <= 6f / 14f && segmentStart > 4f / 14f))
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(154, 217, 235, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 8f / 14f && segmentStart > 6f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("demigirl")) {
+                if ((segmentStart <= 1f && segmentStart > 12f / 14f) || segmentStart <= 2f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(127, 127, 127, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if ((segmentStart <= 12f / 14f && segmentStart > 10f / 14f) || (segmentStart <= 4f / 14f && segmentStart > 2f / 14f))
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(196, 196, 196, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if ((segmentStart <= 10f / 14f && segmentStart > 8f / 14f) || (segmentStart <= 6f / 14f && segmentStart > 4f / 14f))
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 174, 201, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 8f / 14f && segmentStart > 6f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("bigender")) {
+                if (segmentStart <= 1f && segmentStart > 12f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(196, 121, 160, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 12f / 14f && segmentStart > 10f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(236, 166, 203, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 14f && segmentStart > 8f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(214, 199, 233, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 8f / 14f && segmentStart > 6f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 6f / 14f && segmentStart > 4f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(214, 199, 233, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 4f / 14f && segmentStart > 2f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(155, 199, 232, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 2f / 14f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(107, 131, 207, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("amongus") || name.contains("sus")) {
+                if (segmentStart <= 1f && segmentStart > 14f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(199, 16, 18, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 14f / 16f && segmentStart > 13f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(19, 40, 57, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 13f / 16f && segmentStart > 10f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(149, 202, 220, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 16f && segmentStart > 8f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(79, 125, 161, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 8f / 16f && segmentStart > 7f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(19, 40, 57, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 7f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(199, 16, 18, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("pineapple")) {
+                if (segmentStart <= 1f && segmentStart > 14f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 85, 16, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 14f / 16f && segmentStart > 11f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 113, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 11f / 16f && segmentStart > 10f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 16f && segmentStart > 4f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 113, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 4f / 16f && segmentStart > 3f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 3f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 113, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("bi")) {
+                if (segmentStart <= 1f && segmentStart > 10f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(214, 2, 112, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 10f / 16f && segmentStart > 6f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(155, 79, 150, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+                if (segmentStart <= 6f / 16f)
+                    buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 56, 168, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (checkNameForColor(name)) {
+                int color = getColorFromName(name).getMapColor().color;
+                int r = ColorHelper.Argb.getRed(color);
+                int g = ColorHelper.Argb.getGreen(color);
+                int b = ColorHelper.Argb.getBlue(color);
+                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(r, g, b, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (checkNameForHex(name)) {
+                Color color = getHexFromName(name);
+                int r = color.getRed();
+                int g = color.getGreen();
+                int b = color.getBlue();
+                int alpha = color.getAlpha();
+                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(r, g, b, alpha).normal(matrices.getNormalMatrix(), i, j, k).next();
+            } else if (name.contains("invis")) {
+            } else {
                 buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 3f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(51, 62, 189, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("aroace")) {
-            if (segmentStart <= 1f && segmentStart > 12f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(226, 140, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 12f / 15f && segmentStart > 9f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(236, 205, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 9f / 15f && segmentStart > 6f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 6f / 15f && segmentStart > 3f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(98, 174, 220, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 3f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(32, 56, 86, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("aro")) {
-            if (segmentStart <= 1f && segmentStart > 12f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(61, 165, 66, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 12f / 15f && segmentStart > 9f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(167, 211, 121, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 9f / 15f && segmentStart > 6f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 6f / 15f && segmentStart > 3f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(169, 169, 169, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 3f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("ace") || name.contains("asexual")) {
-            if (segmentStart <= 1f && segmentStart > 12f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 12f / 16f && segmentStart > 8f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(163, 163, 163, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 8f / 16f && segmentStart > 4f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 4f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(128, 0, 128, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("pan")) {
-            if (segmentStart <= 1f && segmentStart > 10f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(254, 33, 139, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(254, 215, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(33, 176, 254, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("poly")) {
-            if (segmentStart <= 1f && segmentStart > 10f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(246, 28, 158, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(7, 213, 105, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(28, 146, 246, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("genderqueer")) {
-            if (segmentStart <= 1f && segmentStart > 10f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(181, 126, 220, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(74, 129, 35, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("disability")) {
-            if (segmentStart <= 1f && segmentStart > 10f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(234, 191, 63, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 15f && segmentStart > 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(207, 209, 208, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 5f / 15f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(211, 152, 74, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("demiboy")) {
-            if ((segmentStart <= 1f && segmentStart > 12f / 14f) || segmentStart <= 2f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(127, 127, 127, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if ((segmentStart <= 12f / 14f && segmentStart > 10f / 14f) || (segmentStart <= 4f / 14f && segmentStart > 2f / 14f))
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(196, 196, 196, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if ((segmentStart <= 10f / 14f && segmentStart > 8f / 14f) || (segmentStart <= 6f / 14f && segmentStart > 4f / 14f))
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(154, 217, 235, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 8f / 14f && segmentStart > 6f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("demigirl")) {
-            if ((segmentStart <= 1f && segmentStart > 12f / 14f) || segmentStart <= 2f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(127, 127, 127, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if ((segmentStart <= 12f / 14f && segmentStart > 10f / 14f) || (segmentStart <= 4f / 14f && segmentStart > 2f / 14f))
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(196, 196, 196, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if ((segmentStart <= 10f / 14f && segmentStart > 8f / 14f) || (segmentStart <= 6f / 14f && segmentStart > 4f / 14f))
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 174, 201, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 8f / 14f && segmentStart > 6f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("bigender")) {
-            if (segmentStart <= 1f && segmentStart > 12f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(196, 121, 160, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 12f / 14f && segmentStart > 10f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(236, 166, 203, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 14f && segmentStart > 8f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(214, 199, 233, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 8f / 14f && segmentStart > 6f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 255, 255, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 6f / 14f && segmentStart > 4f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(214, 199, 233, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 4f / 14f && segmentStart > 2f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(155, 199, 232, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 2f / 14f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(107, 131, 207, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("amongus") || name.contains("sus")) {
-            if (segmentStart <= 1f && segmentStart > 14f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(199, 16, 18, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 14f / 16f && segmentStart > 13f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(19, 40, 57, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 13f / 16f && segmentStart > 10f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(149, 202, 220, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 16f && segmentStart > 8f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(79, 125, 161, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 8f / 16f && segmentStart > 7f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(19, 40, 57, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 7f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(199, 16, 18, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("pineapple")) {
-            if (segmentStart <= 1f && segmentStart > 14f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 85, 16, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 14f / 16f && segmentStart > 11f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 113, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 11f / 16f && segmentStart > 10f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 16f && segmentStart > 4f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 113, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 4f / 16f && segmentStart > 3f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 3f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(255, 113, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("bi")) {
-            if (segmentStart <= 1f && segmentStart > 10f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(214, 2, 112, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 10f / 16f && segmentStart > 6f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(155, 79, 150, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-            if (segmentStart <= 6f / 16f)
-                buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 56, 168, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (checkNameForColor(name)) {
-            int color = getColorFromName(name).getMapColor().color;
-            int r = ColorHelper.Argb.getRed(color);
-            int g = ColorHelper.Argb.getGreen(color);
-            int b = ColorHelper.Argb.getBlue(color);
-            buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(r, g, b, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (checkNameForHex(name)) {
-            Color color = getHexFromName(name);
-            int r = color.getRed();
-            int g = color.getGreen();
-            int b = color.getBlue();
-            int alpha = color.getAlpha();
-            buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(r, g, b, alpha).normal(matrices.getNormalMatrix(), i, j, k).next();
-        } else if (name.contains("invis")) {
-        } else {
-            buffer.vertex(matrices.getPositionMatrix(), f, gg, h).color(0, 0, 0, 255).normal(matrices.getNormalMatrix(), i, j, k).next();
+            }
         }
     }
 }
