@@ -1,4 +1,4 @@
-package uwu.feytox.coloredfishingline.client;
+package ru.feytox.coloredfishingline.client;
 
 import net.fabricmc.api.ClientModInitializer;
 

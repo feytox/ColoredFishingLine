@@ -21,7 +21,7 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "uwu.feytox.coloredfishingline.client.ColoredFishingLine"
+      "ru.feytox.coloredfishingline.client.ColoredFishingLine"
     ]
   },
   "mixins": [
@@ -30,6 +30,6 @@
 
   "depends": {
     "fabric": "*",
-    "minecraft": "1.19.x"
+    "minecraft": "1.19.4"
   }
 }

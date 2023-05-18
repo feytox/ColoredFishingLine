@@ -1,4 +1,4 @@
-package uwu.feytox.coloredfishingline.mixin;
+package ru.feytox.coloredfishingline.mixin;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -99,15 +99,12 @@ public abstract class FishingBobberEntityRendererMixin {
         return 0;
     }
 
+   @SuppressWarnings("InvalidInjectorMethodSignature")
    @Inject(method = "render(Lnet/minecraft/entity/projectile/FishingBobberEntity;FFLnet/minecraft/client/util/math/MatrixStack;Lnet/minecraft/client/render/VertexConsumerProvider;I)V",
            at = @At(value = "INVOKE",
                    target = "Lnet/minecraft/client/render/entity/FishingBobberEntityRenderer;renderFishingLine(FFFLnet/minecraft/client/render/VertexConsumer;Lnet/minecraft/client/util/math/MatrixStack$Entry;FF)V"),
-   locals = LocalCapture.CAPTURE_FAILSOFT)
-    private void onRenderFishingLine(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack,
-                                     VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci,
-                                     PlayerEntity playerEntity, int j, float h, float k, double o, double p, double q,
-                                     float r, double s, double t, double u, float v, float w, float x,
-                                     VertexConsumer vertexConsumer2, MatrixStack.Entry entry2, int y, int z) {
+   locals = LocalCapture.CAPTURE_FAILHARD)
+    private void onRenderFishingLine(FishingBobberEntity fishingBobberEntity, float f, float g, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int i, CallbackInfo ci, PlayerEntity playerEntity, int j, float h, float k, double o, double p, double q, float r, double s, double t, double u, float v, float w, float x, VertexConsumer vertexConsumer2, MatrixStack.Entry entry2, int y, int z) {
        PlayerEntity bobberOwner = fishingBobberEntity.getPlayerOwner();
        if (bobberOwner != null) {
            Iterable<ItemStack> itemsHand = bobberOwner.getHandItems();
